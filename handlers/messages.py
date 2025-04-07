@@ -7,11 +7,13 @@ from dotenv import load_dotenv
 from loguru import logger
 
 from middlewares.middlewares import (
+    AuthorizedUserMiddleware,
     ProcessingLockMiddleware,
     RateLimitMiddleware,
-    AuthorizedUserMiddleware,
 )
 from utils.gpt_module import gpt_client
+from utils.speach_to_text import speech_to_text
+
 
 load_dotenv()
 
@@ -64,11 +66,8 @@ async def send_text_message_on_voice(message: Message, bot: Bot) -> None:
     try:
         file_link = await bot.get_file(message.voice.file_id)
         await bot.download_file(file_link.file_path, f"{user_id}_voice.ogg")
-        with open(f"{user_id}_voice.ogg", "rb") as voice_file:
-            answer = await gpt_client.generate_text_on_voice(
-                user_id=user_id,
-                voice=voice_file,
-            )
+        text = speech_to_text(path=f"{user_id}_voice.ogg")
+        answer = await gpt_client.generate_text(text, user_id)
         await message.answer(answer, parse_mode="Markdown")
     except Exception as e:
         logger.error(f"Error: {e}")
@@ -76,6 +75,7 @@ async def send_text_message_on_voice(message: Message, bot: Bot) -> None:
     finally:
         typing_task.cancel()
         os.remove(f"{user_id}_voice.ogg")
+        os.remove(f"{user_id}_voice.wav")
 
 
 async def keep_typing(message: Message, bot: Bot) -> None:
