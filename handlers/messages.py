@@ -14,7 +14,6 @@ from middlewares.middlewares import (
 from utils.gpt_module import gpt_client
 from utils.speach_to_text import speech_to_text
 
-
 load_dotenv()
 
 BOT_TOKEN = os.getenv("BOT_TOKEN")

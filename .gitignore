@@ -179,6 +179,7 @@ message_history.json
 *.mp3
 *.ogg
 *.pcm
+*.wav
 *.db
 temp_voices/
 test.py
