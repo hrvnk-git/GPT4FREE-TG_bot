@@ -1,6 +1,6 @@
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 
-INLINE_KEYBOARD_MARKUP = InlineKeyboardMarkup(
+settings = InlineKeyboardMarkup(
     inline_keyboard=[
         [
             InlineKeyboardButton(text="gpt-4o", callback_data="gpt-4o"),
