@@ -182,3 +182,4 @@ message_history.json
 *.db
 temp_voices/
 test.py
+har_and_cookies/
