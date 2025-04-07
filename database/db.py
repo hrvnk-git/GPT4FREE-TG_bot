@@ -14,21 +14,15 @@ async def init_db():
             )
         """)
         await db.execute("""
-            CREATE TABLE IF NOT EXISTS user_modes (
-                user_id INTEGER PRIMARY KEY,
-                mode TEXT
-            )
-        """)
-        await db.execute("""
-            CREATE TABLE IF NOT EXISTS response_ids (
-                user_id INTEGER PRIMARY KEY,
-                response_id TEXT
-            )
-        """)
-        await db.execute("""
             CREATE TABLE IF NOT EXISTS authorized_users (
                 user_id INTEGER PRIMARY KEY,
                 admin INTEGER DEFAULT 0
+            )
+        """)
+        await db.execute("""
+            CREATE TABLE IF NOT EXISTS current_model (
+                user_id INTEGER PRIMARY KEY,
+                model TEXT DEFAULT 'gpt-4o'
             )
         """)
         await db.commit()
@@ -54,55 +48,6 @@ async def load_history(user_id: int, max_len: int):
         return list(
             reversed([{"role": role, "content": content} for role, content in rows])
         )
-
-
-async def load_user_mode(user_id: int) -> str:
-    async with aiosqlite.connect(DB_FILE) as db:
-        cursor = await db.execute(
-            "SELECT mode FROM user_modes WHERE user_id = ?", (user_id,)
-        )
-        row = await cursor.fetchone()
-        if row:
-            return row[0]
-        else:
-            # Значение по умолчанию - "Ответ текстом"
-            return "Ответ текстом"
-
-
-async def save_user_mode(user_id: int, mode: str):
-    async with aiosqlite.connect(DB_FILE) as db:
-        await db.execute(
-            "REPLACE INTO user_modes (user_id, mode) VALUES (?, ?)", (user_id, mode)
-        )
-        await db.commit()
-
-
-async def load_response_id(user_id: int):
-    async with aiosqlite.connect(DB_FILE) as db:
-        cursor = await db.execute(
-            "SELECT response_id FROM response_ids WHERE user_id = ?", (user_id,)
-        )
-        row = await cursor.fetchone()
-        if row:
-            return row[0]
-        else:
-            # Значение по умолчанию - None
-            return None
-
-
-async def save_response_id(user_id: int, response_id: str):
-    async with aiosqlite.connect(DB_FILE) as db:
-        await db.execute(
-            "REPLACE INTO response_ids (user_id, response_id) VALUES (?, ?)",
-            (user_id, response_id),
-        )
-        await db.commit()
-
-
-async def delete_response_id(user_id: int):
-    async with aiosqlite.connect(DB_FILE) as db:
-        await db.execute("DELETE FROM response_ids WHERE user_id = ?", (user_id,))
-        await db.commit()
 
 
 async def delete_history(user_id: int):
@@ -131,3 +76,23 @@ async def load_authorized_user(user_id: int):
         else:
             # Значение по умолчанию - None
             return None
+
+async def choose_model(user_id: int, model: str):
+    async with aiosqlite.connect(DB_FILE) as db:
+        await db.execute(
+            "INSERT OR REPLACE INTO current_model (user_id, model) VALUES (?, ?)",
+            (user_id, model),
+        )
+        await db.commit()
+
+async def get_model(user_id: int):
+    async with aiosqlite.connect(DB_FILE) as db:
+        cursor = await db.execute(
+            "SELECT model FROM current_model WHERE user_id = ?", (user_id,)
+        )
+        row = await cursor.fetchone()
+        if row:
+            return row[0]
+        else:
+            # Значение по умолчанию - gpt-4o
+            return "gpt-4o"

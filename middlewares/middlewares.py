@@ -22,7 +22,6 @@ class AuthorizedUserMiddleware(BaseMiddleware):
         event: TelegramObject,
         data: Dict[str, Any],
     ) -> Any:
-        
         if isinstance(event, Message):
             user_id = event.from_user.id  # type: ignore
             authorized_user = await load_authorized_user(user_id)
@@ -33,7 +32,6 @@ class AuthorizedUserMiddleware(BaseMiddleware):
                     "```Ошибка! У вас нет доступа к этому боту.```",
                     parse_mode="Markdown",
                 )
-                # Если пользователь не авторизован — не передаём управление хендлеру
                 return
 
 
@@ -51,8 +49,6 @@ class ProcessingLockMiddleware(BaseMiddleware):
                     parse_mode="Markdown",
                 )
                 return
-
-            # Захватываем Lock, чтобы другие сообщения ждали завершения
             async with processing_lock:
                 return await handler(event, data)
 
