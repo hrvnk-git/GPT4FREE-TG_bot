@@ -31,7 +31,7 @@ async def any_message(message: Message, bot: Bot) -> None:
             answer = await ChatGPT(
                 user_id=message.from_user.id, user_text=message.text
             ).generate_text()
-            await message.answer(answer)
+            await message.answer(answer, parse_mode="Markdown")
         except Exception as e:
             logger.error(f"Error: {e}")
             await message.answer("Произошла ошибка при обработке текста.")
