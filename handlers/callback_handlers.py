@@ -13,7 +13,11 @@ async def process_model_selection(callback_query: CallbackQuery):
     )  # получаем выбранную модель (например, "gpt-4o")
     user_id = callback_query.from_user.id
     await choose_model(user_id=user_id, model=selected_model)
-    await callback_query.message.answer(
+    await callback_query.answer(
         f"Выбрана модель: *{selected_model}*", parse_mode="Markdown"
-    , )
+    )
+    await callback_query.message.answer(
+        f"Выбрана модель: *{selected_model}*",
+        parse_mode="Markdown",
+    )
     await callback_query.message.delete()

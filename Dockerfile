@@ -10,8 +10,7 @@ WORKDIR /app
 COPY --from=builder /app /app
 
 # Устанавливаем wget и xz-utils для работы с xz-архивами и скачивания ffmpeg
-RUN apt-get update && apt-get install -y --no-install-recommends wget xz-utils flac curl \
-    && curl -LsSf https://astral.sh/uv/install.sh | sh \
+RUN apt-get update && apt-get install -y --no-install-recommends wget xz-utils flac \
     && wget https://johnvansickle.com/ffmpeg/releases/ffmpeg-release-amd64-static.tar.xz \
     && tar -xJf ffmpeg-release-amd64-static.tar.xz \
     && mv ffmpeg-*-static/ffmpeg /usr/local/bin/ \
@@ -19,6 +18,5 @@ RUN apt-get update && apt-get install -y --no-install-recommends wget xz-utils f
     && rm -rf ffmpeg-*-static ffmpeg-release-amd64-static.tar.xz \
     && apt-get purge -y wget xz-utils && apt-get autoremove -y && rm -rf /var/lib/apt/lists/*
     
-RUN pip install --no-cache-dir -r requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 CMD ["python3", "main.py"]
