@@ -31,7 +31,11 @@ async def any_message(message: Message, bot: Bot) -> None:
             answer = await ChatGPT(
                 user_id=message.from_user.id, user_text=message.text
             ).generate_text()
-            await message.answer(answer, parse_mode="Markdown")
+            if len(answer) <= 4096:
+                await message.answer(answer, parse_mode="Markdown")
+            elif len(answer) > 4096:
+                for i in range(0, len(answer), 4096):
+                    await message.answer(answer[i : i + 4096], parse_mode="Markdown")
         except Exception as e:
             logger.error(f"Error: {e}")
             await message.answer("Произошла ошибка при обработке текста.")
@@ -46,7 +50,11 @@ async def handle_photo(message: Message, bot: Bot) -> None:
             answer = await ChatGPT(
                 user_id=message.from_user.id, user_text=message.caption
             ).receive_photo(url)
-            await message.answer(answer)
+            if len(answer) <= 4096:
+                await message.answer(answer, parse_mode="Markdown")
+            elif len(answer) > 4096:
+                for i in range(0, len(answer), 4096):
+                    await message.answer(answer[i : i + 4096], parse_mode="Markdown")
         except Exception as e:
             logger.error(f"Error: {e}")
             await message.answer("Произошла ошибка при обработке фото.")
@@ -61,7 +69,11 @@ async def send_text_message_on_voice(message: Message, bot: Bot) -> None:
             await bot.download_file(file_link.file_path, f"{user_id}_voice.ogg")
             text = speech_to_text(path=f"{user_id}_voice.ogg")
             answer = await ChatGPT(user_id=user_id, user_text=text).generate_text()
-            await message.answer(answer, parse_mode="Markdown")
+            if len(answer) <= 4096:
+                await message.answer(answer, parse_mode="Markdown")
+            elif len(answer) > 4096:
+                for i in range(0, len(answer), 4096):
+                    await message.answer(answer[i : i + 4096], parse_mode="Markdown")
         except Exception as e:
             logger.error(f"Error: {e}")
             await message.answer("Произошла ошибка при обработке голосового сообщения.")
