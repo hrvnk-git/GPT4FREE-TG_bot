@@ -1,18 +1,11 @@
-import os
 from asyncio import Lock
 from time import monotonic
 from typing import Any, Awaitable, Callable, Dict
 
 from aiogram import BaseMiddleware
 from aiogram.types import Message, TelegramObject
-from dotenv import load_dotenv
 
 from database.db import load_authorized_user
-
-load_dotenv()
-
-# Глобальный Lock, который предотвращает одновременную обработку команд
-processing_lock = Lock()
 
 
 class AuthorizedUserMiddleware(BaseMiddleware):
@@ -23,7 +16,7 @@ class AuthorizedUserMiddleware(BaseMiddleware):
         data: Dict[str, Any],
     ) -> Any:
         if isinstance(event, Message):
-            user_id = event.from_user.id  # type: ignore
+            user_id = event.from_user.id
             authorized_user = await load_authorized_user(user_id)
             if user_id == authorized_user:
                 return await handler(event, data)
@@ -36,6 +29,10 @@ class AuthorizedUserMiddleware(BaseMiddleware):
 
 
 class ProcessingLockMiddleware(BaseMiddleware):
+    def __init__(self):
+        super().__init__()
+        self.user_locks: Dict[int, Lock] = {}  # локи пользователей
+
     async def __call__(
         self,
         handler: Callable[[TelegramObject, Dict[str, Any]], Awaitable[Any]],
@@ -43,14 +40,20 @@ class ProcessingLockMiddleware(BaseMiddleware):
         data: Dict[str, Any],
     ) -> Any:
         if isinstance(event, Message):
-            if processing_lock.locked():
+            user_id = event.from_user.id
+            lock = self.user_locks.setdefault(user_id, Lock())
+            if lock.locked():
                 await event.answer(
-                    "```Подожди! Бот занят немного...   ```",
+                    "`Подожди! Я ещё не закончил отвечать тебе.`",
                     parse_mode="Markdown",
                 )
                 return
-            async with processing_lock:
-                return await handler(event, data)
+            async with lock:
+                try:
+                    return await handler(event, data)
+                finally:
+                    # Удаляем лок после использования
+                    self.user_locks.pop(user_id, None)
 
 
 class RateLimitMiddleware(BaseMiddleware):
@@ -66,7 +69,7 @@ class RateLimitMiddleware(BaseMiddleware):
     ) -> Any:
         if isinstance(event, Message):
             current_time = monotonic()
-            user_id = event.from_user.id  # type: ignore
+            user_id = event.from_user.id
             last_time = self.user_last_time.get(user_id, 0)
             if current_time - last_time < self.limit_seconds:
                 await event.answer(
