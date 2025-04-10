@@ -45,7 +45,7 @@ class ChatGPT:
                 "function": {
                     "arguments": {
                         # "query": "Latest advancements in AI",
-                        "max_results": 20,
+                        "max_results": 10,
                         "max_words": 2000,
                         "backend": "auto",
                         "add_text": True,
@@ -83,7 +83,7 @@ class ChatGPT:
                     pre_answer = await self.generate_response(messages=user_query_2)
                     google_query = [{"role": "user", "content": pre_answer}]
                     google_answer = await self.generate_response(
-                        messages=google_query, tool_calls=tool_function
+                        messages=google_query, tool_calls=tool_function, web_search=True
                     )
                     user_query_3 = [
                         {"role": "user", "content": self.user_text},
