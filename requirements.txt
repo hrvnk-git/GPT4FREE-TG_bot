@@ -4,5 +4,5 @@ dotenv
 g4f
 loguru
 pydub
-SpeechRecognition
+SpeechRecognition==3.14.2
 g4f[search]

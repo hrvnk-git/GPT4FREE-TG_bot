@@ -83,6 +83,7 @@ async def send_text_message_on_voice(message: Message, bot: Bot) -> None:
             await bot.download_file(file_link.file_path, f"{user_id}_voice.ogg") # type: ignore
             text = speech_to_text(path=f"{user_id}_voice.ogg")
             answer = await ChatGPT(user_id=user_id, user_text=text).generate_text()
+            await message.answer(f"```Текст:\n{text}```", parse_mode="Markdown") # type: ignore (text)
             if len(answer) <= 4096:
                 await message.answer(answer, parse_mode="Markdown")
             elif len(answer) > 4096:
