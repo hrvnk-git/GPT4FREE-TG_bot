@@ -16,13 +16,13 @@ class AuthorizedUserMiddleware(BaseMiddleware):
         data: Dict[str, Any],
     ) -> Any:
         if isinstance(event, Message):
-            user_id = event.from_user.id
+            user_id = event.from_user.id  # type: ignore
             authorized_user = await load_authorized_user(user_id)
             if user_id == authorized_user:
                 return await handler(event, data)
             else:
                 await event.answer(
-                    "```Ошибка! У вас нет доступа к этому боту.```",
+                    "*Ошибка! У вас нет доступа к этому боту.*",
                     parse_mode="Markdown",
                 )
                 return
@@ -40,11 +40,11 @@ class ProcessingLockMiddleware(BaseMiddleware):
         data: Dict[str, Any],
     ) -> Any:
         if isinstance(event, Message):
-            user_id = event.from_user.id
+            user_id = event.from_user.id  # type: ignore
             lock = self.user_locks.setdefault(user_id, Lock())
             if lock.locked():
                 await event.answer(
-                    "`Подожди! Я ещё не закончил отвечать тебе.`",
+                    "*Подожди! Я ещё не закончил отвечать тебе.*",
                     parse_mode="Markdown",
                 )
                 return
@@ -69,11 +69,11 @@ class RateLimitMiddleware(BaseMiddleware):
     ) -> Any:
         if isinstance(event, Message):
             current_time = monotonic()
-            user_id = event.from_user.id
+            user_id = event.from_user.id  # type: ignore
             last_time = self.user_last_time.get(user_id, 0)
             if current_time - last_time < self.limit_seconds:
                 await event.answer(
-                    "Пожалуйста, не спамьте сообщения. Подождите немного...",
+                    "*Пожалуйста, не спамьте сообщения. Подождите немного...*",
                     parse_mode="Markdown",
                 )
                 return

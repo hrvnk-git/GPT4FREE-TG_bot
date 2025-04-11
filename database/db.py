@@ -14,21 +14,17 @@ async def init_db():
             )
         """)
         await db.execute("""
-            CREATE TABLE IF NOT EXISTS authorized_users (
+            CREATE TABLE IF NOT EXISTS settings (
                 user_id INTEGER PRIMARY KEY,
-                admin INTEGER DEFAULT 0
-            )
-        """)
-        await db.execute("""
-            CREATE TABLE IF NOT EXISTS current_model (
-                user_id INTEGER PRIMARY KEY,
-                model TEXT DEFAULT 'gpt-4o'
+                admin INTEGER DEFAULT 0,
+                model TEXT,
+                web_search INTEGER DEFAULT 0
             )
         """)
         await db.commit()
 
 
-async def save_message(user_id: int, role: str, content: str):
+async def save_history(user_id: int, role: str, content: str):
     async with aiosqlite.connect(DB_FILE) as db:
         await db.execute(
             "INSERT INTO message_history (user_id, role, content) VALUES (?, ?, ?)",
@@ -59,7 +55,7 @@ async def delete_history(user_id: int):
 async def add_authorized_user(user_id: int, admin: int = 0):
     async with aiosqlite.connect(DB_FILE) as db:
         await db.execute(
-            "INSERT OR REPLACE INTO authorized_users (user_id, admin) VALUES (?, ?)",
+            "INSERT OR REPLACE INTO settings (user_id, admin) VALUES (?, ?)",
             (user_id, admin),
         )
         await db.commit()
@@ -68,7 +64,7 @@ async def add_authorized_user(user_id: int, admin: int = 0):
 async def load_authorized_user(user_id: int):
     async with aiosqlite.connect(DB_FILE) as db:
         cursor = await db.execute(
-            "SELECT user_id FROM authorized_users WHERE user_id = ?", (user_id,)
+            "SELECT user_id FROM settings WHERE user_id = ?", (user_id,)
         )
         row = await cursor.fetchone()
         if row:
@@ -77,18 +73,11 @@ async def load_authorized_user(user_id: int):
             # Значение по умолчанию - None
             return None
 
-async def choose_model(user_id: int, model: str):
-    async with aiosqlite.connect(DB_FILE) as db:
-        await db.execute(
-            "INSERT OR REPLACE INTO current_model (user_id, model) VALUES (?, ?)",
-            (user_id, model),
-        )
-        await db.commit()
 
 async def get_model(user_id: int):
     async with aiosqlite.connect(DB_FILE) as db:
         cursor = await db.execute(
-            "SELECT model FROM current_model WHERE user_id = ?", (user_id,)
+            "SELECT model FROM settings WHERE user_id = ?", (user_id,)
         )
         row = await cursor.fetchone()
         if row:
@@ -96,3 +85,33 @@ async def get_model(user_id: int):
         else:
             # Значение по умолчанию - gpt-4o
             return "gpt-4o"
+
+
+async def set_model(user_id: int, model: str):
+    async with aiosqlite.connect(DB_FILE) as db:
+        await db.execute(
+            "INSERT OR REPLACE INTO settings (user_id, model) VALUES (?, ?)",
+            (user_id, model),
+        )
+        await db.commit()
+
+
+async def get_web_search(user_id: int):
+    async with aiosqlite.connect(DB_FILE) as db:
+        cursor = await db.execute(
+            "SELECT web_search FROM settings WHERE user_id = ?", (user_id,)
+        )
+        row = await cursor.fetchone()
+        if row:
+            return row[0]
+        else:
+            return False
+
+
+async def set_web_search(user_id: int, web_search: bool):
+    async with aiosqlite.connect(DB_FILE) as db:
+        await db.execute(
+            "INSERT OR REPLACE INTO settings (user_id, web_search) VALUES (?, ?)",
+            (user_id, web_search),
+        )
+        await db.commit()

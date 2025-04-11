@@ -2,7 +2,7 @@ import speech_recognition as sr
 from pydub import AudioSegment
 
 
-def speech_to_text(path: str, lang: str = "ru-RU") -> dict:
+def speech_to_text(path: str, lang: str = "ru-RU") -> str:
     if path.split(".")[-1] != "wav":
         AudioSegment.from_file(path).export(f"{path.rsplit('.')[0]}.wav", format="wav")
         path = f"{path.rsplit('.')[0]}.wav"
