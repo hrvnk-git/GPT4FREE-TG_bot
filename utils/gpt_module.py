@@ -85,11 +85,13 @@ class ChatGPT:
         if self.user_text:
             user_text = self.user_text
         else:
-            user_text = "Что на фото?"
+            user_text = "Вот фото"
         response = await self.client.chat.completions.create(
             model="o1",
             messages=[
                 {
+                    "role": "system",
+                    "content": prompt,
                     "role": "user",
                     "content": [
                         {"type": "text", "text": user_text},
