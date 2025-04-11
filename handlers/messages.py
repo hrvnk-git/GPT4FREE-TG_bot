@@ -76,13 +76,23 @@ async def handle_photo(message: Message, bot: Bot) -> None:
 @flags.chat_action("typing")
 async def send_text_message_on_voice(message: Message, bot: Bot) -> None:
     user_id = message.from_user.id # type: ignore
+    websearch_status = await get_web_search(user_id)
+    model = await get_model(user_id)
+    answer = ""
     attempt = 0
     while attempt < 3:
         try:
             file_link = await bot.get_file(message.voice.file_id) # type: ignore
             await bot.download_file(file_link.file_path, f"{user_id}_voice.ogg") # type: ignore
             text = speech_to_text(path=f"{user_id}_voice.ogg")
-            answer = await ChatGPT(user_id=user_id, user_text=text).generate_text()
+            if websearch_status:
+                answer = await ChatGPT(
+                    user_id=user_id, user_text=text, model=model # type: ignore
+                ).generate_text_with_web()
+            if not websearch_status:
+                answer = await ChatGPT(
+                    user_id=user_id, user_text=text, model=model # type: ignore
+                ).generate_text()
             await message.answer(f"```Текст:\n{text}```", parse_mode="Markdown") # type: ignore (text)
             if len(answer) <= 4096:
                 await message.answer(answer, parse_mode="Markdown")
