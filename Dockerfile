@@ -19,5 +19,4 @@ RUN apt-get update && apt-get install -y --no-install-recommends wget xz-utils f
     && apt-get purge -y wget xz-utils && apt-get autoremove -y && rm -rf /var/lib/apt/lists/*
     
 RUN pip install --no-cache-dir -r requirements.txt
-RUN pip install -U "g4f[search]"
 CMD ["python3", "main.py"]
