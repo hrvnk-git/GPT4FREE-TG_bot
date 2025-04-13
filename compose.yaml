@@ -8,5 +8,4 @@ services:
       - BOT_TOKEN=${BOT_TOKEN}
       - AUTHORIZED_USER_ID=${AUTHORIZED_USER_ID}
     volumes:
-      - ./bot.log:/app/bot.log
-      - ./history.db:/app/history.db
+      - ./data:/app/data

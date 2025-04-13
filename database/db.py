@@ -1,6 +1,6 @@
 import aiosqlite
 
-DB_FILE = "history.db"
+DB_FILE = "data/history.db"
 
 
 async def init_db():
