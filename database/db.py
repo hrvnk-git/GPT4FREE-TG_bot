@@ -5,22 +5,26 @@ DB_FILE = "history.db"
 
 async def init_db():
     async with aiosqlite.connect(DB_FILE) as db:
-        await db.execute("""
+        await db.execute(
+            """
             CREATE TABLE IF NOT EXISTS message_history (
                 user_id INTEGER,
                 role TEXT,
                 content TEXT,
                 timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
             )
-        """)
-        await db.execute("""
+            """
+        )
+        await db.execute(
+            """
             CREATE TABLE IF NOT EXISTS settings (
                 user_id INTEGER PRIMARY KEY,
                 admin INTEGER DEFAULT 0,
                 model TEXT,
                 web_search INTEGER DEFAULT 0
             )
-        """)
+        """
+        )
         await db.commit()
 
 
@@ -113,6 +117,6 @@ async def set_web_search(user_id: int, web_search: bool):
     async with aiosqlite.connect(DB_FILE) as db:
         await db.execute(
             "UPDATE settings SET web_search = ? WHERE user_id = ?",
-            (web_search,user_id),
+            (web_search, user_id),
         )
         await db.commit()

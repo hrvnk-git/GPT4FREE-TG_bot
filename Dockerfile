@@ -2,7 +2,7 @@
 
 FROM python:3.13-slim as builder
 WORKDIR /app
-COPY . /app
+# COPY . /app
 
 ### Финальный образ с минимальной сборкой ffmpeg и утилитой flac
 FROM python:3.13-slim
@@ -18,5 +18,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends wget xz-utils f
     && rm -rf ffmpeg-*-static ffmpeg-release-amd64-static.tar.xz \
     && apt-get purge -y wget xz-utils && apt-get autoremove -y && rm -rf /var/lib/apt/lists/*
     
-RUN pip install --no-cache-dir -r requirements.txt
-CMD ["python3", "main.py"]
+RUN pip install uv
+COPY . /app
+CMD ["uv", "run", "main.py"]

@@ -77,7 +77,7 @@ async def cmd_add(message: Message) -> None:
         return
     user_id = int(args[0].strip())
     try:
-        await add_authorized_user(user_id)
+        await add_authorized_user(user_id=user_id, admin=0)
         await message.answer("Пользователь добавлен в базу данных.")
     except Exception as e:
         await message.answer(f"Ошибка при добавлении пользователя: {e}")
