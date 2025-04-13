@@ -52,11 +52,11 @@ async def delete_history(user_id: int):
         await db.commit()
 
 
-async def add_authorized_user(user_id: int, admin: int = 0):
+async def add_authorized_user(user_id: int, admin: int, model: str):
     async with aiosqlite.connect(DB_FILE) as db:
         await db.execute(
-            "INSERT OR REPLACE INTO settings (user_id, admin) VALUES (?, ?)",
-            (user_id, admin),
+            "INSERT OR REPLACE INTO settings (user_id, admin, model) VALUES (?, ?, ?)",
+            (user_id, admin, model),
         )
         await db.commit()
 

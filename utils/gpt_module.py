@@ -18,7 +18,7 @@ class ChatGPT:
     def __init__(self, user_id: int, user_text: str, model: str = "gpt-4o"):
         self.client = AsyncClient(
             provider=RetryProvider(
-                [PollinationsAI, Blackbox], shuffle=False, max_retries=3
+                [Blackbox, PollinationsAI], shuffle=False, max_retries=3
             )
         )
         self.user_id = user_id
@@ -87,7 +87,7 @@ class ChatGPT:
         else:
             user_text = "Вот фото"
         response = await self.client.chat.completions.create(
-            model="gpt-4o",
+            model="o1",
             messages=[
                 {
                     "role": "system",

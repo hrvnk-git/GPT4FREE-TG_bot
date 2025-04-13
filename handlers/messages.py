@@ -70,7 +70,7 @@ async def handle_photo(message: Message, bot: Bot) -> None:
             user_text=message.caption,
         ).answer_on_photo(url)
         if len(answer) <= 4096:
-            await message.answer(answer, parse_mode="Markdown")
+            await message.answer(answer)
         else:
             for i in range(0, len(answer), 4096):
                 await message.answer(answer[i : i + 4096])
