@@ -40,10 +40,7 @@ async def load_history(user_id: int, max_len: int):
             (user_id, max_len),
         )
         rows = await cursor.fetchall()
-        # Вернуть в хронологическом порядке (от старых к новым)
-        return list(
-            reversed([{"role": role, "content": content} for role, content in rows])
-        )
+        return [{"role": role, "content": content} for role, content in rows]
 
 
 async def delete_history(user_id: int):

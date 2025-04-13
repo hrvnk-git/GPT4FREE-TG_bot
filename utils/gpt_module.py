@@ -13,6 +13,7 @@ HISTORY_MAX_LEN = 10
 client_bb = AsyncClient(provider=RetryProvider([Blackbox], max_retries=3))
 client_polly = AsyncClient(provider=RetryProvider([PollinationsAI], max_retries=3))
 
+
 class ChatGPT:
     """Класс ChatGPT для взаимодействия с gpt4free"""
 
