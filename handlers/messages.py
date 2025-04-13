@@ -1,5 +1,6 @@
 import asyncio
 import os
+import re
 
 from aiogram import Bot, F, Router, flags
 from aiogram.types import Message
@@ -48,7 +49,8 @@ async def any_message(message: Message) -> None:
                 user_text=message.text,
                 model=model,
             ).generate_text()
-        logger.info(f"Answer: {answer}")
+        if answer.startswith("<think>"):
+            answer = re.sub(r"<think>.*?</think>", "", answer, flags=re.DOTALL)
         if len(answer) <= 4096:
             await message.answer(answer, parse_mode="Markdown")
         else:

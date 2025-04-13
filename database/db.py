@@ -52,11 +52,15 @@ async def delete_history(user_id: int):
         await db.commit()
 
 
-async def add_authorized_user(user_id: int, admin: int, model: str):
+async def add_authorized_user(user_id: int, admin: int):
     async with aiosqlite.connect(DB_FILE) as db:
         await db.execute(
-            "INSERT OR REPLACE INTO settings (user_id, admin, model) VALUES (?, ?, ?)",
-            (user_id, admin, model),
+            "INSERT OR IGNORE INTO settings (user_id, admin) VALUES (?, ?)",
+            (user_id, 0),
+        )
+        await db.execute(
+            "UPDATE settings SET admin = ? WHERE user_id = ?",
+            (admin, user_id),
         )
         await db.commit()
 
@@ -90,8 +94,8 @@ async def get_model(user_id: int):
 async def set_model(user_id: int, model: str):
     async with aiosqlite.connect(DB_FILE) as db:
         await db.execute(
-            "INSERT OR REPLACE INTO settings (user_id, model) VALUES (?, ?)",
-            (user_id, model),
+            "UPDATE settings SET model = ? WHERE user_id = ?",
+            (model, user_id),
         )
         await db.commit()
 
@@ -111,7 +115,7 @@ async def get_web_search(user_id: int):
 async def set_web_search(user_id: int, web_search: bool):
     async with aiosqlite.connect(DB_FILE) as db:
         await db.execute(
-            "INSERT OR REPLACE INTO settings (user_id, web_search) VALUES (?, ?)",
-            (user_id, web_search),
+            "UPDATE settings SET web_search = ? WHERE user_id = ?",
+            (web_search,user_id),
         )
         await db.commit()

@@ -19,7 +19,7 @@ AUTHORIZED_USER_ID = os.getenv("AUTHORIZED_USER_ID")
 
 async def main():
     await init_db()
-    await add_authorized_user(user_id=int(AUTHORIZED_USER_ID), admin=1, model="o1")
+    await add_authorized_user(user_id=int(AUTHORIZED_USER_ID), admin=1)
 
     bot = Bot(token=BOT_TOKEN)
     dp = Dispatcher(storage=MemoryStorage())
