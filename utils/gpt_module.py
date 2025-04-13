@@ -87,7 +87,7 @@ class ChatGPT:
         else:
             user_text = "Вот фото"
         response = await self.client.chat.completions.create(
-            model="o1",
+            model="gpt-4o",
             messages=[
                 {
                     "role": "system",
