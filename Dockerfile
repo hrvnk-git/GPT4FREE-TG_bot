@@ -6,6 +6,7 @@ WORKDIR /app
 ### Финальный образ с минимальной сборкой ffmpeg и утилитой flac
 FROM python:3.13-slim
 WORKDIR /app
+ENV PYTHONUNBUFFERED=1
 COPY --from=builder /app /app
 
 # Устанавливаем wget и xz-utils для работы с xz-архивами и скачивания ffmpeg

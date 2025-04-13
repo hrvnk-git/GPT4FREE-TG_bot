@@ -1,15 +1,16 @@
+import logging
+
 import g4f.debug
 from dotenv import load_dotenv
 from g4f.client import AsyncClient
 from g4f.Provider import Blackbox, PollinationsAI, RetryProvider
 
-from config import prompt
+from config import HISTORY_MAX_LEN, prompt
 from database.db import load_history, save_history
 
 g4f.debug.logging = True
 load_dotenv()
 
-HISTORY_MAX_LEN = 10
 client_bb = AsyncClient(provider=RetryProvider([Blackbox], max_retries=3))
 client_polly = AsyncClient(provider=RetryProvider([PollinationsAI], max_retries=3))
 
@@ -17,7 +18,7 @@ client_polly = AsyncClient(provider=RetryProvider([PollinationsAI], max_retries=
 class ChatGPT:
     """Класс ChatGPT для взаимодействия с gpt4free"""
 
-    def __init__(self, user_id: int, user_text: str, model: str = "gpt-4o"):
+    def __init__(self, user_id: int, user_text: str, model: str):
         self.user_id = user_id
         self.user_text = user_text
         self.model = model
