@@ -18,7 +18,7 @@ client_polly = AsyncClient(provider=RetryProvider([PollinationsAI], max_retries=
 class ChatGPT:
     """Класс ChatGPT для взаимодействия с gpt4free"""
 
-    def __init__(self, user_id: int, user_text: str, model: str):
+    def __init__(self, user_id: int, user_text: str, model: str = "gpt-4o"):
         self.user_id = user_id
         self.user_text = user_text
         self.model = model
